@@ -1,5 +1,6 @@
 class BirdsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
+  rescue_from ActiveRecord::RecordInvalid, with: :render_invalid_response
 
   # GET /birds
   def index
@@ -22,7 +23,7 @@ class BirdsController < ApplicationController
   # PATCH /birds/:id
   def update
     bird = find_bird
-    bird.update(bird_params)
+    bird.update!(bird_params)
     render json: bird
   end
 
@@ -47,4 +48,7 @@ class BirdsController < ApplicationController
     render json: { error: "Bird not found" }, status: :not_found
   end
 
+  def render_invalid_response
+    render json: { errors: invalid.record.errors.full_messages }, status: :unprocessable_entity
+  end
 end
